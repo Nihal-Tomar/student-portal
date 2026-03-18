@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: #1e1f26;
+      color: white;
+      width: 230px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .sidebar h2 {
+      text-align: center;
+      color: #00bcd4;
+      margin-bottom: 40px;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      margin: 12px 0;
+      display: block;
+      padding: 10px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+    .sidebar a:hover {
+      background: #00bcd4;
+      color: black;
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+    .header {
+      background: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 22px;
+      color: #333;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    .card h3 {
+      color: #00796b;
+      margin-bottom: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    button {
+      background: #00796b;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #009688;
+    }
+    pre {
+      background: #263238;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    input[type="number"], input[type="date"], select {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div>
+      <h2>📘 Teacher Panel</h2>
+      <a href="#">🏠 Dashboard</a>
+      <a href="#attendance">📅 Attendance</a>
+      <a href="#marks">🧮 Marks</a>
+      <a href="#view">📊 View Data</a>
+    </div>
+    <div>
+      <a href="teacher_login.html">🚪 Logout</a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <h1>Welcome, Teacher 👋</h1>
+      <span id="date"></span>
+    </div>
+
+    <div class="cards">
+      <!-- Attendance Section -->
+      <div class="card" id="attendance">
+        <h3>📅 Attendance Entry</h3>
+        <label>Select Date:</label><br>
+        <input type="date" id="dateInput"><br><br>
+        <table>
+          <tr><th>Student</th><th>Present</th></tr>
+          <tr><td>Riya</td><td><input type="checkbox" id="attRiya"></td></tr>
+          <tr><td>Aman</td><td><input type="checkbox" id="attAman"></td></tr>
+          <tr><td>Priya</td><td><input type="checkbox" id="attPriya"></td></tr>
+        </table>
+        <button onclick="saveAttendance()">💾 Save Attendance</button>
+      </div>
+
+      <!-- Marks Section -->
+      <div class="card" id="marks">
+        <h3>🧮 Marks Entry</h3>
+        <label>Choose Subject:</label>
+        <select id="subjectSelect">
+          <option value="Chemistry">Chemistry</option>
+          <option value="Math">Math</option>
+          <option value="Physics">Physics</option>
+        </select><br><br>
+        <table>
+          <tr><th>Student</th><th>Marks</th></tr>
+          <tr><td>Riya</td><td><input type="number" id="marksRiya" min="0" max="100"></td></tr>
+          <tr><td>Aman</td><td><input type="number" id="marksAman" min="0" max="100"></td></tr>
+          <tr><td>Priya</td><td><input type="number" id="marksPriya" min="0" max="100"></td></tr>
+        </table>
+        <button onclick="saveMarks()">💾 Save Marks</button>
+      </div>
+
+      <!-- View Section -->
+      <div class="card" id="view">
+        <h3>📊 View Data</h3>
+        <button onclick="viewAttendance()">📅 View Attendance</button>
+        <button onclick="viewMarks()">🧮 View Marks</button>
+        <pre id="output">No data yet.</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Show today's date
+    document.getElementById("date").textContent = new Date().toDateString();
+
+    // Save attendance
+    function saveAttendance() {
+      const date = document.getElementById("dateInput").value;
+      if (!date) {
+        alert("Please select a date!");
+        return;
+      }
+
+      const attendance = {
+        date: date,
+        students: {
+          Riya: document.getElementById("attRiya").checked,
+          Aman: document.getElementById("attAman").checked,
+          Priya: document.getElementById("attPriya").checked
+        }
+      };
+
+      let allAttendance = JSON.parse(localStorage.getItem("attendanceData")) || [];
+      allAttendance.push(attendance);
+      localStorage.setItem("attendanceData", JSON.stringify(allAttendance));
+
+      alert("✅ Attendance saved successfully!");
+    }
+
+    // Save marks
+    function saveMarks() {
+      const subject = document.getElementById("subjectSelect").value;
+      const marks = {
+        subject: subject,
+        students: {
+          Riya: document.getElementById("marksRiya").value,
+          Aman: document.getElementById("marksAman").value,
+          Priya: document.getElementById("marksPriya").value
+        }
+      };
+
+      let allMarks = JSON.parse(localStorage.getItem("marksData")) || [];
+      allMarks.push(marks);
+      localStorage.setItem("marksData", JSON.stringify(allMarks));
+
+      alert("✅ Marks saved successfully!");
+    }
+
+    // View Attendance
+    function viewAttendance() {
+      const data = JSON.parse(localStorage.getItem("attendanceData")) || [];
+      if (data.length === 0) {
+        document.getElementById("output").textContent = "No attendance records found.";
+        return;
+      }
+
+      let output = "📅 Attendance Records:\n\n";
+      data.forEach((entry, index) => {
+        output += `${index + 1}. Date: ${entry.date}\n`;
+        for (const [name, present] of Object.entries(entry.students)) {
+          output += `   - ${name}: ${present ? "Present ✅" : "Absent ❌"}\n`;
+        }
+        output += "\n";
+      });
+
+      document.getElementById("output").textContent = output;
+    }
+
+    // View Marks
+    function viewMarks() {
+      const data = JSON.parse(localStorage.getItem("marksData")) || [];
+      if (data.length === 0) {
+        document.getElementById("output").textContent = "No marks records found.";
+        return;
+      }
+
+      let output = "🧮 Marks Records:\n\n";
+      data.forEach((entry, index) => {
+        output += `${index + 1}. Subject: ${entry.subject}\n`;
+        for (const [name, mark] of Object.entries(entry.students)) {
+          output += `   - ${name}: ${mark || "N/A"}\n`;
+        }
+        output += "\n";
+      });
+
+      document.getElementById("output").textContent = output;
+    }
+  </script>
+</body>
+</html>

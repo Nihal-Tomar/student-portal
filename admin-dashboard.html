@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Dashboard | Student Management System</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #f4f6f9;
+    overflow-x: hidden;
+  }
+
+  .navbar {
+    background: linear-gradient(90deg, #0d47a1, #1976d2);
+    color: white;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    height: 60px;
+  }
+
+  .navbar h2 { margin: 0; font-size: 18px; white-space: nowrap; }
+  .navbar span { font-size: 13px; opacity: 0.9; display: flex; align-items: center; gap: 10px; }
+  .navbar a {
+    color: #fff; text-decoration: none;
+    background: rgba(255,255,255,0.2);
+    padding: 5px 10px; border-radius: 6px;
+    transition: 0.3s;
+  }
+  .navbar a:hover { background: rgba(255,255,255,0.4); }
+
+  .sidebar {
+    width: 220px;
+    background: #1e1e1e;
+    color: white;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    height: calc(100vh - 60px);
+    padding-top: 15px;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.2);
+    overflow-y: auto;
+  }
+
+  .sidebar h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #4fc3f7;
+    font-size: 17px;
+  }
+
+  .sidebar button {
+    display: block;
+    width: 85%;
+    margin: 8px auto;
+    padding: 10px 15px;
+    background: #2e2e2e;
+    border: none;
+    border-radius: 8px;
+    color: #ccc;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    transition: 0.3s;
+  }
+  .sidebar button:hover { background: #1976d2; color: white; }
+
+  .content {
+    margin-left: 240px;
+    padding: 25px 30px;
+    min-height: calc(100vh - 60px);
+  }
+
+  .form-box {
+    background: white;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .form-box.active { display: block; }
+  .form-box h3 {
+    color: #0d47a1;
+    margin-top: 0;
+    border-bottom: 2px solid #1976d2;
+    display: inline-block;
+    padding-bottom: 5px;
+  }
+
+  label { display: block; margin-top: 10px; font-weight: 500; color: #333; }
+  input, textarea, select {
+    width: 95%; padding: 10px; margin-top: 5px;
+    border: 1px solid #bbb; border-radius: 6px; font-family: inherit;
+  }
+  button[type="submit"] {
+    background: #1976d2; color: white; border: none;
+    padding: 10px 15px; border-radius: 6px;
+    margin-top: 10px; cursor: pointer; transition: 0.3s;
+  }
+  button[type="submit"]:hover { background: #0d47a1; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { padding: 10px; text-align: center; border: 1px solid #ccc; }
+  th { background: #1976d2; color: white; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .footer { text-align: center; margin-top: 30px; color: #777; font-size: 13px; }
+
+  @media (max-width: 1366px) {
+    .navbar h2 { font-size: 16px; }
+    .navbar span { font-size: 12px; }
+    .sidebar button { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="navbar">
+    <h2>🎓 Student Management System</h2>
+    <span>Email: admin@gmail.com | Name: Admin
+      <a href="login.html">Logout</a>
+    </span>
+  </div>
+
+  <div class="sidebar">
+    <h3>📋 Admin Menu</h3>
+    <button onclick="showForm('dashboardHome')">🏠 Dashboard Home</button>
+    <button onclick="showForm('viewStudent')">👨‍🎓 View Students</button>
+    <button onclick="showForm('searchStudent')">🔍 Search Student</button>
+    <button onclick="showForm('addStudent')">➕ Add Student</button>
+    <button onclick="showForm('editStudent')">✏️ Edit Student</button>
+    <button onclick="showForm('deleteStudent')">❌ Delete Student</button>
+    <button onclick="showForm('viewAttendance')">📅 View Attendance</button>
+    <button onclick="showForm('viewMarks')">📊 View Marks</button>
+    <button onclick="showForm('showTeachers')">👩‍🏫 Show Teachers</button>
+    <button onclick="showForm('addTeacher')">➕ Add Teacher</button>
+    <button onclick="showForm('announce')">📢 Announcements</button>
+  </div>
+
+  <div class="content">
+
+    <div class="form-box active" id="dashboardHome">
+      <h3>🏠 Admin Dashboard</h3>
+      <p>Welcome, <strong>Admin</strong>! Use the sidebar to manage students, teachers, and announcements.</p>
+      <ul>
+        <li>Total Students: <strong id="studentCount">5</strong></li>
+        <li>Total Teachers: <strong id="teacherCount">10</strong></li>
+        <li>Recent Updates: Attendance uploaded for Science class</li>
+      </ul>
+    </div>
+
+    <div class="form-box" id="viewStudent">
+      <h3>👨‍🎓 View Students</h3>
+      <table id="studentTable">
+        <tr><th>Roll No</th><th>Name</th><th>Class</th><th>Email</th></tr>
+      </table>
+    </div>
+
+    <div class="form-box" id="editStudent">
+      <h3>✏️ Edit Student Details</h3>
+      <form id="editForm">
+        <label>Roll No:</label><input type="text" id="editRoll" required>
+        <label>Update Name:</label><input type="text" id="editName">
+        <label>Update Class:</label><input type="text" id="editClass">
+        <label>Update Email:</label><input type="email" id="editEmail">
+        <button type="submit">Update</button>
+      </form>
+    </div>
+    
+    <div class="form-box" id="searchStudent">
+      <h3>🔍 Search Student</h3>
+      <label>Enter Roll No:</label>
+      <input type="text" id="searchInput" placeholder="Enter roll number..." required>
+      <button type="submit" onclick="searchStudent()">Search</button>
+      <div id="searchResult"></div>
+    </div>
+
+    <div class="form-box" id="addStudent">
+      <h3>➕ Add New Student</h3>
+      <form id="addStudentForm">
+        <label>Roll No:</label><input type="text" id="sRoll" required>
+        <label>Name:</label><input type="text" id="sName" required>
+        <label>Class:</label><input type="text" id="sClass" required>
+        <label>Email:</label><input type="email" id="sEmail" required>
+        <button type="submit">Add Student</button>
+      </form>
+    </div>
+
+    <div class="form-box" id="deleteStudent">
+      <h3>❌ Delete Student</h3>
+      <form id="deleteForm">
+        <label>Enter Roll No:</label>
+        <input type="text" id="deleteRoll" required>
+        <button type="submit" style="background:#d32f2f;">Delete</button>
+      </form>
+    </div>
+
+    <div class="form-box" id="viewAttendance">
+      <h3>📅 View Attendance</h3>
+      <table>
+        <tr><th>Date</th><th>Class</th><th>Present</th><th>Absent</th></tr>
+        <tr><td>2025-10-10</td><td>10A</td><td>45</td><td>5</td></tr>
+      </table>
+    </div>
+
+    <div class="form-box" id="viewMarks">
+      <h3>📊 View Marks</h3>
+      <table>
+        <tr><th>Student</th><th>Subject</th><th>Marks</th></tr>
+        <tr><td>Ravi Kumar</td><td>Math</td><td>85</td></tr>
+      </table>
+    </div>
+
+    <div class="form-box" id="showTeachers">
+      <h3>👩‍🏫 Teachers List</h3>
+      <table id="teacherTable">
+        <tr><th>ID</th><th>Name</th><th>Subject</th><th>Email</th></tr>
+        <tr><td>1</td><td>Mr. Sharma</td><td>Maths</td><td>sharma@gmail.com</td></tr>
+      </table>
+    </div>
+
+    <div class="form-box" id="addTeacher">
+      <h3>➕ Add Teacher</h3>
+      <form id="teacherForm">
+        <label>Teacher ID:</label><input type="text" id="tId" required>
+        <label>Name:</label><input type="text" id="tName" required>
+        <label>Subject:</label><input type="text" id="tSubject" required>
+        <label>Email:</label><input type="email" id="tEmail" required>
+        <button type="submit">Add Teacher</button>
+      </form>
+    </div>
+
+    <div class="footer">© 2025 Student Management System 💻</div>
+  </div>
+
+  <script>
+    function showForm(id) {
+      document.querySelectorAll('.form-box').forEach(f => f.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    let students = [
+      { roll: '101', name: 'Riya', class: '10A', email: 'riya@gmail.com' },
+      { roll: '102', name: 'Aman', class: '10A', email: 'aman@gmail.com' },
+      { roll: '103', name: 'Priya', class: '10B', email: 'priya@gmail.com' },
+      { roll: '104', name: 'Ravi', class: '10C', email: 'ravi@gmail.com' },
+      { roll: '105', name: 'Simran', class: '10C', email: 'simran@gmail.com' }
+    ];
+
+    function renderStudents() {
+      const table = document.getElementById("studentTable");
+      table.innerHTML = `<tr><th>Roll No</th><th>Name</th><th>Class</th><th>Email</th></tr>`;
+      students.forEach(s => {
+        const row = `<tr><td>${s.roll}</td><td>${s.name}</td><td>${s.class}</td><td>${s.email}</td></tr>`;
+        table.innerHTML += row;
+      });
+      document.getElementById("studentCount").textContent = students.length;
+    }
+
+    renderStudents();
+
+    document.getElementById("addStudentForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const roll = sRoll.value.trim(), name = sName.value.trim(), cls = sClass.value.trim(), email = sEmail.value.trim();
+      students.push({ roll, name, class: cls, email });
+      alert("Student added successfully!");
+      renderStudents();
+      e.target.reset();
+      showForm('viewStudent');
+    });
+
+    document.getElementById("deleteForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const roll = deleteRoll.value.trim();
+      students = students.filter(s => s.roll !== roll);
+      alert("Student deleted successfully!");
+      renderStudents();
+      e.target.reset();
+      showForm('viewStudent');
+    });
+
+    function searchStudent() {
+      const roll = document.getElementById("searchInput").value.trim();
+      const resultDiv = document.getElementById("searchResult");
+      const student = students.find(s => s.roll === roll);
+      if (student) {
+        resultDiv.innerHTML = `
+          <table>
+            <tr><th>Roll No</th><th>Name</th><th>Class</th><th>Email</th></tr>
+            <tr><td>${student.roll}</td><td>${student.name}</td><td>${student.class}</td><td>${student.email}</td></tr>
+          </table>
+        `;
+      } else {
+        resultDiv.innerHTML = `<p style='color:red;'>No student found with Roll No ${roll}</p>`;
+      }
+    }
+
+    document.getElementById("teacherForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const table = document.getElementById("teacherTable");
+      const id = tId.value.trim(), name = tName.value.trim(), subject = tSubject.value.trim(), email = tEmail.value.trim();
+      const newRow = table.insertRow(-1);
+      newRow.innerHTML = `<td>${id}</td><td>${name}</td><td>${subject}</td><td>${email}</td>`;
+      document.getElementById("teacherCount").textContent = parseInt(document.getElementById("teacherCount").textContent) + 1;
+      alert("Teacher added successfully!");
+      e.target.reset();
+      showForm('showTeachers');
+    });
+  </script>
+</body>
+</html>

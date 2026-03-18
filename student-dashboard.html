@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Student Dashboard</title>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #43cea2, #185a9d);
+    min-height: 100vh;
+    color: #333;
+  }
+
+  header {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    border-bottom: 3px solid #43cea2;
+  }
+
+  header h2 {
+    margin: 0;
+    color: #185a9d;
+  }
+
+  main {
+    padding: 30px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+  }
+
+  section {
+    background: white;
+    width: 340px;
+    padding: 20px 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  }
+
+  h3 {
+    color: #185a9d;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #43cea2;
+    display: inline-block;
+    padding-bottom: 5px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #ccc;
+  }
+
+  li:last-child {
+    border-bottom: none;
+  }
+
+  .present {
+    color: green;
+    font-weight: 500;
+  }
+
+  .absent {
+    color: red;
+    font-weight: 500;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 13px;
+    color: white;
+    opacity: 0.9;
+  }
+
+  .logout-btn {
+    background: #ff4d4d;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    transition: 0.3s;
+  }
+
+  .logout-btn:hover {
+    background: #d63031;
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+  <h2>🎓 Welcome to Your Dashboard</h2>
+</header>
+
+<main>
+  <section>
+    <h3>📅 Attendance</h3>
+    <ul id="attendanceList"></ul>
+  </section>
+
+  <section>
+    <h3>📊 Marks</h3>
+    <ul id="marksList"></ul>
+  </section>
+</main>
+
+<div class="footer">© 2025 Student Management System 💻</div>
+
+<script>
+  // Sample attendance data for three students
+  const attendanceData = [
+    { date: "2025-09-01", subject: 'Math', student01: true, student02: false, student03: true },
+    { date: "2025-09-02", subject: 'Science', student01: true, student02: true, student03: false },
+    { date: "2025-09-03", subject: 'History', student01: false, student02: true, student03: true }
+  ];
+
+  // Sample marks data
+  const marksData = [
+    { subject: 'Math', student01: 85, student02: 76, student03: 90 },
+    { subject: 'Science', student01: 90, student02: 88, student03: 72 },
+    { subject: 'History', student01: 70, student02: 85, student03: 80 }
+  ];
+
+  const studentId = localStorage.getItem('loggedStudentId');
+
+  function displayAttendance() {
+    const list = document.getElementById('attendanceList');
+    list.innerHTML = '';
+
+    if (!studentId) {
+      list.innerHTML = '<li>Please login to view attendance.</li>';
+      return;
+    }
+
+    const records = attendanceData.filter(r => studentId in r);
+    if (records.length === 0) {
+      list.innerHTML = '<li>No attendance records found.</li>';
+      return;
+    }
+
+    records.forEach(r => {
+      const status = r[studentId] ? 'Present' : 'Absent';
+      const li = document.createElement('li');
+      li.innerHTML = `<strong>${r.subject}</strong> (${r.date}): <span class="${status.toLowerCase()}">${status}</span>`;
+      list.appendChild(li);
+    });
+  }
+
+  function displayMarks() {
+    const list = document.getElementById('marksList');
+    list.innerHTML = '';
+
+    if (!studentId) {
+      list.innerHTML = '<li>Please login to view marks.</li>';
+      return;
+    }
+
+    const records = marksData.filter(r => studentId in r);
+    if (records.length === 0) {
+      list.innerHTML = '<li>No marks records found.</li>';
+      return;
+    }
+
+    records.forEach(r => {
+      const li = document.createElement('li');
+      li.innerHTML = `<strong>${r.subject}</strong>: ${r[studentId]} marks`;
+      list.appendChild(li);
+    });
+  }
+
+  function logout() {
+    localStorage.removeItem('loggedStudentId');
+    alert('Logged out successfully!');
+    window.location.href = 'student_login.html';
+  }
+
+  if (!studentId) {
+    alert('No student is logged in. Redirecting to login page.');
+    window.location.href = 'student_login.html';
+  } else {
+    displayAttendance();
+    displayMarks();
+  }
+</script>
+
+</body>
+</html>
